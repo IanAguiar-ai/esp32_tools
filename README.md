@@ -1,7 +1,7 @@
 # esp32_tools
 Libraries for micropython using esp32.
 
-#For more details about the libraries enter:
+**For more details about the libraries enter:**
 ```
 help(name_of_library)
 ```
