@@ -1,2 +1,2 @@
 # esp32_tools
-Tools for esp32 in micropython
+Libraries for micropython using esp32.
