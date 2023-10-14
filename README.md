@@ -32,6 +32,7 @@ pin_data = 2
 pin_clock = 3
 pin_latch = 4
 shift_register_and_display = Register(pin_data, pin_clock, pin_latch)
+
 # Here how the number is constructed in the display is already defined, but you can still pass a dictionary to define this and put it in the 'number' argument.
 #Defalt number:
 #self.number = {0:[1,1,1,1,1,1,0],
@@ -118,8 +119,8 @@ for i in range(30):
   sleep(0.01)
   temporal_series_graph.add(random() * 100)
   temporal_series_graph.pass_to_graph()
-  ##
+
   ## Other things on display
-  ##
+
   oled.fill(0) ## Clean the display
 ```
