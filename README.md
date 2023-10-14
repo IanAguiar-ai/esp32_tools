@@ -1,7 +1,12 @@
 # esp32_tools
 Libraries for micropython using esp32.
 
-## button_hub.py
+#For more details about the libraries enter:
+```
+help(name_of_library)
+```
+
+## ```button_hub.py```
 Class that allows you to use both normal buttons and inverted buttons:
 
 ```
@@ -11,12 +16,12 @@ door = 5
 botton_1 = Botton(door)
 
 if botton_1.value():
-  print("Botton is 1")
+  print("Botton is ON")
 else:
-  print("Botton is 0")
+  print("Botton is OFF")
 ```
 
-## register.py
+## ```register.py```
 Shift Register adaptable for number displays.
 It's still in testing, but here's an example:
 
@@ -40,9 +45,81 @@ shift_register_and_display = Register(pin_data, pin_clock, pin_latch)
 #                8:[1,1,1,1,1,1,1],
 #                9:[0,1,1,1,1,1,1]}
 
-shift_register_and_display
+shift_register_and_display.put_number(2023)
 ```
 
-## ws2812b_hub.py
+You can still call a timer:
+```
+from register import Register
 
-## graph_in_ssd1306.py
+pin_data = 2
+pin_clock = 3
+pin_latch = 4
+shift_register_and_display = Register(pin_data, pin_clock, pin_latch)
+
+shift_register_and_display.timer() #Preferably leave this running in a thread
+```
+
+
+## ```ws2812b_hub.py```
+
+### This library allows for easier handling of LED strips using the ```Leds``` class, adding predefined colors and some effects. Additionally, it is possible to assemble an LED display using this library, utilizing the ```Matrix_Leds``` class.
+
+Example ```Leds```:
+```
+from ws2812b_hub import color, numbers, Leds
+ 
+pin = 5
+width = 7*3*5 #7 is the number of 'blocks,' 3 is the number of LEDs per block, and 5 is the number of digits on a board with this strip
+my_tape_led = Leds(pin, width)
+
+my_tap_led.add_numbers(numbers, values = "57281") #If the strip is allocated correctly, it will display '57281' on the LEDs
+```
+
+Example ```Matrix_Leds```:
+```
+from ws2812b_hub import color, numbers, Matrix_Leds
+
+#If you assemble a matrix of LEDs from top to bottom like this:
+#    >>>>>>>>>>>>>>v
+#    v<<<<<<<<<<<<<<
+#    >>>>>>>>>>>>>>v
+#    v<<<<<<<<<<<<<<
+ 
+pin = 5
+width = 30*10 #Width and height of LEDs, Note that in reality, this is a strip with 300 LEDs:
+lines = 10
+my_led_tv = Matrix_Leds(pin, width, lines)
+
+you_dict = {"C":[[1,1,1,1,1],
+                  [0,0,0,0,1],
+                  [1,0,0,0,0],
+                  [0,0,0,0,1],
+                  [1,1,1,1,1]]}
+
+my_led_tv.strings = you_dict #Your dict of characters
+
+my_led_tv.write("ABCDEFGHIJ")
+```
+
+## ```graph_in_ssd1306.py```
+Library made to generate time series graphs, exemple:
+
+```
+from graph_in_ssd1306 import Graph
+import ssd1306 #Dependenci
+
+oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
+temporal_series_graph = Graph(oled, x = (30, 100), y = (10, 40), dimensions_visor = (128, 64))
+
+from random import random
+from time import sleep
+for i in range(30):
+  sleep(0.01)
+  temporal_series_graph.add(random() * 100)
+  temporal_series_graph.pass_to_graph()
+  ##
+  ## Other things on display
+  ##
+  oled.fill(0) ## Clean the display
+```
