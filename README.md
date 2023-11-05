@@ -93,9 +93,9 @@ lines = 10
 my_led_tv = Matrix_Leds(pin, width, lines)
 
 you_dict = {"C":[[1,1,1,1,1],
-                  [0,0,0,0,1],
                   [1,0,0,0,0],
-                  [0,0,0,0,1],
+                  [1,0,0,0,0],
+                  [1,0,0,0,0],
                   [1,1,1,1,1]]}
 
 my_led_tv.strings = you_dict #Your dict of characters
