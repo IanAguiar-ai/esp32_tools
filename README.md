@@ -124,3 +124,12 @@ for i in range(30):
 
   oled.fill(0) ## Clean the display
 ```
+
+## ```wifi_esp32.py```
+Library to help connect esp32 to wifi, exemple:
+
+```
+wifi = Wifi(["net_1", "net_2"], ["pass_1", "pass_2", "pass_3"])
+wifi.connect()
+wifi.open_web_page()
+```
