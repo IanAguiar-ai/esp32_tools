@@ -58,7 +58,7 @@ class Wifi:
     def is_connected(self):
         return self.net.isconnected()
 
-    def open_web_page(self, page, logic, times = 5):
+    def open_web_page(self, page, logic, times = 5, args_page:dict = None, args_logic:dict = None):
         """
         Open a web page using a socket and read the result after a certain time
         """
@@ -102,12 +102,19 @@ class Wifi:
                 print("Receiving...")
                 request = conn.recv(1024)
                 print(f"{'-'*10}\nContent {request}\n{'-'*10}")
-                logic(str(request))
+
+                if args_logic != None:
+                    logic(str(request), **args_logic)
+                else:
+                    logic(str(request))
                 
                 if type(page) is str:
                     response = page
                 else:
-                    response = page()
+                    if args_logic != None:
+                        response = page(**args_page)
+                    else:
+                        response = page()
                 conn.send("HTTP/1.1 200 OK\n")
                 conn.send("Content-Type: text/html\n")
                 conn.send("Connection: close\n\n")
@@ -121,13 +128,13 @@ class Wifi:
         return True
             
 if __name__ == "__main__":
-    def web_page():
+    def web_page(t):
         html = """<html><head> <title>ESP Web Server</title> <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,"> <style>html{font-family: Helvetica; display:inline-block; margin: 0px auto; text-align: center;}
   h1{color: #0F3376; padding: 2vh;}p{font-size: 1.5rem;}.button{display: inline-block; background-color: #e7bd3b; border: none; 
   border-radius: 4px; color: white; padding: 16px 40px; text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}
   .button2{background-color: #4286f4;}</style></head><body> <h1>ESP Web Server</h1> 
-  <p>GPIO state: <strong> ??? /strong></p><p><a href="/?led=on"><button class="button">ON</button></a></p>
+  <p>GPIO state: <strong> """ + str(t) + """ /strong></p><p><a href="/?led=on"><button class="button">ON</button></a></p>
   <p><a href="/?led=off"><button class="button button2">OFF</button></a></p></body></html>"""
         return html
     
@@ -139,4 +146,4 @@ if __name__ == "__main__":
     
     wifi = Wifi("login", "senha")
     wifi.connect()
-    deu = wifi.open_web_page(web_page, logic)
+    deu = wifi.open_web_page(web_page, logic, args_page = {"t":"teste"})
