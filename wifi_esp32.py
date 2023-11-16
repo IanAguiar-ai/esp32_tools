@@ -58,7 +58,7 @@ class Wifi:
     def is_connected(self):
         return self.net.isconnected()
 
-    def open_web_page(self, page, logic, times = 5, args_page:dict = None, args_logic:dict = None):
+    def open_web_page(self, page, logic, times = 1, args_page:dict = None, args_logic:dict = None):
         """
         Open a web page using a socket and read the result after a certain time
         """
@@ -86,7 +86,7 @@ class Wifi:
         
         if not connected_now:
             print("Unable to open socket!")
-            return
+            return False
 
         if self.net.isconnected():
             while times > 0:
@@ -104,9 +104,9 @@ class Wifi:
                 print(f"{'-'*10}\nContent {request}\n{'-'*10}")
 
                 if args_logic != None:
-                    logic(str(request), **args_logic)
+                    return_logic = logic(str(request), **args_logic)
                 else:
-                    logic(str(request))
+                    return_logic = logic(str(request))
                 
                 if type(page) is str:
                     response = page
@@ -125,7 +125,7 @@ class Wifi:
             print("Not connect in wifi!")
             return False
         
-        return True
+        return return_logic
             
 if __name__ == "__main__":
     def web_page(t):
