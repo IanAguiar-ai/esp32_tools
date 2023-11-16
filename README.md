@@ -133,3 +133,14 @@ wifi = Wifi(["net_1", "net_2"], ["pass_1", "pass_2", "pass_3"])
 wifi.connect()
 wifi.open_web_page()
 ```
+
+## ```log.py```
+Library to create log:
+
+```
+log = Log("log_esp")
+log.add("My log!")
+log.size()
+my_log = log.read()
+print(my_log)
+```
