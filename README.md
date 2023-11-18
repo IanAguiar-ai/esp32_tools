@@ -129,9 +129,25 @@ for i in range(30):
 Library to help connect esp32 to wifi, exemple:
 
 ```
+def web_page(t):
+  html = """<html><head> <title>ESP Web Server</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,"> <style>html{font-family: Helvetica; display:inline-block; margin: 0px auto; text-align: center;}
+  h1{color: #0F3376; padding: 2vh;}p{font-size: 1.5rem;}.button{display: inline-block; background-color: #e7bd3b; border: none; 
+  border-radius: 4px; color: white; padding: 16px 40px; text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}
+  .button2{background-color: #4286f4;}</style></head><body> <h1>ESP Web Server</h1> 
+  <p>GPIO state: <strong> """ + str(t) + """ /strong></p><p><a href="/?led=on"><button class="button">ON</button></a></p>
+  <p><a href="/?led=off"><button class="button button2">OFF</button></a></p></body></html>"""
+  return html
+    
+def logic(text):
+  if text.find("led=on") > -1:
+    print(">>> LED IS 1")
+  if text.find("led=off") > -1:
+    print(">>> LED IS 0")
+
 wifi = Wifi(["net_1", "net_2"], ["pass_1", "pass_2", "pass_3"])
 wifi.connect()
-wifi.open_web_page()
+ok = wifi.open_web_page(web_page, logic, args_page = {"t":"test"})
 ```
 
 ## ```log.py```
