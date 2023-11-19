@@ -57,13 +57,11 @@ class Leds:
             dif = 3
             while True:
                 for i in range(self.width):
-                    self.leds[i][0] -= dif
-                    self.leds[i][1] -= dif
-                    self.leds[i][2] -= dif
+                    self.leds[i] = [max(self.leds[i][0] - dif, 0), max(self.leds[i][1] - dif, 0), max(self.leds[i][2] - dif, 0)]
 
                 self.leds.write()
                     
-                if sum(list(map(sum,a))) == 0:
+                if sum(list(map(sum,seld.leds))) == 0:
                     break
 
         elif animation == 2: #random
@@ -74,8 +72,8 @@ class Leds:
                         if random() < 0.1:
                             self.leds[i] = [0, 0, 0]
                 self.leds.write()
-                    
-                if sum(list(map(sum,a))) == 0:
+
+                if sum(list(map(sum,self.leds))) == 0:
                     break
 
     def return_colors(self):
@@ -126,7 +124,7 @@ class Leds:
         self.leds.write()
         
         while True:
-            temp = [*temp[-1], *temp[0:-1]]
+            temp = [temp[-1], *temp[0:-1]] #Corrigir aqui
             for i in temp:
                 self.leds[i] = i
             self.leds.write()
@@ -136,7 +134,7 @@ class Leds:
         """
         It helps to create displays, pass the list of characters in a list and pass a string of what should be written.
         """
-        if self.numbers = None:
+        if self.numbers == None:
             self.numbers = design_list
         else:
             design_list = self.numbers
@@ -246,7 +244,7 @@ class Matrix_Leds:
             for j in range(len(matrix[0])):
                 final_matrix.append(matrix[i][j])
 
-        for i in range(self.width)
+        for i in range(self.width):
             self.leds[i] = final_matrix[i]
 
         self.leds.write()
