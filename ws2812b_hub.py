@@ -83,6 +83,23 @@ class Leds:
         temp = [self.leds[i] for i in range(self.width)]
         return temp
 
+    def animation(self, animation:str, value = None):
+        if animation == "load" and value != None:
+            for i in range(value):
+                self.leds[i] =  [100, 100, int(i * 255/self.width)]
+            self.leds.write()
+
+        elif animation == "wait":
+            if value == None:
+                value = 0.05
+            for i in range(self.width):
+                if self.leds[i] != [0, 0, 0]:
+                    temp = self.leds[i]
+                    self.leds[i] = [min(int(self.leds[i][0] * 0.6), 255), min(int(self.leds[i][1] * 1.4), 255), min(int(self.leds[i][2]  * 1.4), 255)]
+                    self.leds.write()
+                    self.leds[i] = temp
+                sleep(value)
+        
     def test(self):
         """
         test the LED strip here
@@ -92,9 +109,7 @@ class Leds:
             for i in range(self.width):
                 for j in range(0, i):
                     if self.leds[j] != [0, 0, 0]:
-                        self.leds[j][0] = int(self.leds[j][0] * 0.9)
-                        self.leds[j][1] = int(self.leds[j][1] * 0.9)
-                        self.leds[j][2] = int(self.leds[j][2] * 0.9)
+                        self.leds[j] = [max(int(self.leds[i][0] * 0.9), 0), max(int(self.leds[i][1] * 0.9), 0), max(int(self.leds[i][2] * 0.9), 0)]
                 self.leds[i] = color_
                 self.leds.write()
                 sleep(0.05)
@@ -103,9 +118,7 @@ class Leds:
             for k in range(10):
                 for i in range(self.width):
                     if self.leds[j] != [0, 0, 0]:
-                        self.leds[j][0] = int(self.leds[j][0] * 0.9)
-                        self.leds[j][1] = int(self.leds[j][1] * 0.9)
-                        self.leds[j][2] = int(self.leds[j][2] * 0.9)
+                        self.leds[j] = [max(int(self.leds[i][0] * 0.9), 0), max(int(self.leds[i][1] * 0.9), 0), max(int(self.leds[i][2] * 0.9), 0)]
                 self.leds.write()
                 sleep(0.025)
 
@@ -117,18 +130,10 @@ class Leds:
                 self.add_numbers(values = k)
                 self.leds.write()
             
-            
         for i in range(self.width):
             temp.append([int(random()*256), int(random()*256), int(random()*256)])
             self.leds[i] = temp[-1]
         self.leds.write()
-        
-        while True:
-            temp = [temp[-1], *temp[0:-1]] #Corrigir aqui
-            for i in temp:
-                self.leds[i] = i
-            self.leds.write()
-            sleep(0.25)
 
     def add_numbers(self, design_list:dict = False, color:list = [255, 255, 255], values:str = False, animation:int = 0):
         """
