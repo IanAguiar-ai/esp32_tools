@@ -86,19 +86,42 @@ class Leds:
     def animation(self, animation:str, value = None):
         if animation == "load" and value != None:
             for i in range(value):
-                self.leds[i] =  [100, 100, int(i * 255/self.width)]
+                self.leds[i] =  [100, 100, max(int(i * 255/self.width), 255)]
             self.leds.write()
 
         elif animation == "wait":
             if value == None:
                 value = 0.05
-            for i in range(self.width):
-                if self.leds[i] != [0, 0, 0]:
-                    temp = self.leds[i]
-                    self.leds[i] = [min(int(self.leds[i][0] * 0.6), 255), min(int(self.leds[i][1] * 1.4), 255), min(int(self.leds[i][2]  * 1.4), 255)]
-                    self.leds.write()
-                    self.leds[i] = temp
-                sleep(value)
+            if type(value) == list:
+                for i in range(self.width):
+                    if self.leds[i] != [0, 0, 0]:
+                        temp = self.leds[i]
+                        self.leds[i] = value
+                        self.leds.write()
+                        self.leds[i] = temp
+                    sleep(0.05)
+            else:
+                for i in range(self.width):
+                    if self.leds[i] != [0, 0, 0]:
+                        try:
+                            if i > 0:
+                                temp = self.leds[i - 1]
+                                self.leds[i - 1] = [min(int(self.leds[i][0] * 0.7), 255), min(int(self.leds[i][1] * 1.3), 255), min(int(self.leds[i][2]  * 1.3), 255)]
+                                self.leds[i - 1] = temp
+                        except:
+                            pass
+                        try:
+                            if i < width - 1:
+                                temp = self.leds[i + 1]
+                                self.leds[i + 1] = [min(int(self.leds[i][0] * 0.7), 255), min(int(self.leds[i][1] * 1.3), 255), min(int(self.leds[i][2]  * 1.3), 255)]
+                                self.leds[i + 1] = temp
+                        except:
+                            pass
+                        temp = self.leds[i]
+                        self.leds[i] = [min(int(self.leds[i][0] * 0.3), 255), min(int(self.leds[i][1] * 1.7), 255), min(int(self.leds[i][2]  * 1.7), 255)]
+                        self.leds.write()
+                        self.leds[i] = temp
+                    sleep(value)
         
     def test(self):
         """
@@ -253,7 +276,6 @@ class Matrix_Leds:
             self.leds[i] = final_matrix[i]
 
         self.leds.write()
-        
 
 color = {"blue": [0,0,255],
          "lightblue": [173,216,230],
@@ -294,7 +316,8 @@ color = {"blue": [0,0,255],
          "powderblue": [176,224,230],
          "gray": [128,128,128],
          "silver": [192,192,192],
-         "dimgray": [105,105,105]}
+         "dimgray": [105,105,105],
+         "fire": [255, 40, 0]}
 
 numbers = {"0":[1,1,1,
                 1,1,1,
