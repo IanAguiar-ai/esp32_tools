@@ -5,7 +5,7 @@ Connect to WiFi
 import socket
 import network
 import gc
-from time import sleep
+from time import sleep, time
 
 class Wifi:
     """
@@ -26,6 +26,25 @@ class Wifi:
         self.net.active(False)
         self.ip = None
         self.config = None
+
+    def connect_continuos(self):
+        """
+        In https://docs.micropython.org/en/latest/esp32/quickref.html
+        Keeps looping until connected
+        """
+        self.net.active(True)
+        while True:
+            if not self.net.isconnected():
+                for login_wifi in self.login:
+                    t0 = time()
+                    for password_wifi in self.password:
+                        print(f"Connecting to {login_wifi}...")
+                        self.net.connect(login_wifi, password_wifi)
+                        while not self.net.isconnected() and time() - t0 < 10:
+                            sleep(0.1)
+                        if self.net.isconnected():
+                            print(f"Network config: {self.net.ifconfig()} in {login_wifi}")
+                            return 
 
     def connect(self):
         """
