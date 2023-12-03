@@ -6,7 +6,6 @@ import machine
 from neopixel import NeoPixel
 from random import random
 from time import sleep
-from math import cos
 
 class Leds:
     def __init__(self, door:int, width:int, bpp:int = 3):
@@ -58,11 +57,13 @@ class Leds:
             dif = 3
             while True:
                 for i in range(self.width):
-                    self.leds[i] = [max(self.leds[i][0] - dif, 0), max(self.leds[i][1] - dif, 0), max(self.leds[i][2] - dif, 0)]
+                    self.leds[i][0] -= dif
+                    self.leds[i][1] -= dif
+                    self.leds[i][2] -= dif
 
                 self.leds.write()
                     
-                if sum(list(map(sum,seld.leds))) == 0:
+                if sum(list(map(sum,a))) == 0:
                     break
 
         elif animation == 2: #random
@@ -73,8 +74,8 @@ class Leds:
                         if random() < 0.1:
                             self.leds[i] = [0, 0, 0]
                 self.leds.write()
-
-                if sum(list(map(sum,self.leds))) == 0:
+                    
+                if sum(list(map(sum,a))) == 0:
                     break
 
     def return_colors(self):
@@ -84,73 +85,6 @@ class Leds:
         temp = [self.leds[i] for i in range(self.width)]
         return temp
 
-    def rainbow(self, width = 20, iterations = 100, pause = 0.02):
-        """
-        Animation of rainbow
-        """
-        colors = []
-        for i in range(self.width):
-            i = i/width
-            colors.append([int((cos(i) + 1)*128),
-                           int((cos(i * 2) + 1)*128),
-                           int((cos(i * 3)/2 + 1)*128)])
-            
-        for i in range(self.width):
-            self.leds[i] = colors[i]
-        self.leds.write()
-        sleep(pause)
-
-        for k in range(iterations):
-            k = k/width
-            colors.pop(0)
-            colors.append([int((cos(i+k) + 1)*128),
-                           int((cos((i+k) * 2) + 1)*128),
-                           int((cos((i+k) * 3)/2 + 1)*128)])
-            for i in range(self.width):
-                self.leds[i] = colors[i]
-            self.leds.write()
-            sleep(pause)
-
-    def animation(self, animation:str, value = None):
-        if animation == "load" and value != None:
-            for i in range(value):
-                self.leds[i] =  [100, 100, max(int(i * 255/self.width), 255)]
-            self.leds.write()
-
-        elif animation == "wait":
-            if value == None:
-                value = 0.05
-            if type(value) == list:
-                for i in range(self.width):
-                    if self.leds[i] != [0, 0, 0]:
-                        temp = self.leds[i]
-                        self.leds[i] = value
-                        self.leds.write()
-                        self.leds[i] = temp
-                    sleep(0.05)
-            else:
-                for i in range(self.width):
-                    if self.leds[i] != [0, 0, 0]:
-                        try:
-                            if i > 0:
-                                temp = self.leds[i - 1]
-                                self.leds[i - 1] = [min(int(self.leds[i][0] * 0.7), 255), min(int(self.leds[i][1] * 1.3), 255), min(int(self.leds[i][2]  * 1.3), 255)]
-                                self.leds[i - 1] = temp
-                        except:
-                            pass
-                        try:
-                            if i < width - 1:
-                                temp = self.leds[i + 1]
-                                self.leds[i + 1] = [min(int(self.leds[i][0] * 0.7), 255), min(int(self.leds[i][1] * 1.3), 255), min(int(self.leds[i][2]  * 1.3), 255)]
-                                self.leds[i + 1] = temp
-                        except:
-                            pass
-                        temp = self.leds[i]
-                        self.leds[i] = [min(int(self.leds[i][0] * 0.3), 255), min(int(self.leds[i][1] * 1.7), 255), min(int(self.leds[i][2]  * 1.7), 255)]
-                        self.leds.write()
-                        self.leds[i] = temp
-                    sleep(value)
-        
     def test(self):
         """
         test the LED strip here
@@ -160,7 +94,9 @@ class Leds:
             for i in range(self.width):
                 for j in range(0, i):
                     if self.leds[j] != [0, 0, 0]:
-                        self.leds[j] = [max(int(self.leds[i][0] * 0.9), 0), max(int(self.leds[i][1] * 0.9), 0), max(int(self.leds[i][2] * 0.9), 0)]
+                        self.leds[j][0] = int(self.leds[j][0] * 0.9)
+                        self.leds[j][1] = int(self.leds[j][1] * 0.9)
+                        self.leds[j][2] = int(self.leds[j][2] * 0.9)
                 self.leds[i] = color_
                 self.leds.write()
                 sleep(0.05)
@@ -169,7 +105,9 @@ class Leds:
             for k in range(10):
                 for i in range(self.width):
                     if self.leds[j] != [0, 0, 0]:
-                        self.leds[j] = [max(int(self.leds[i][0] * 0.9), 0), max(int(self.leds[i][1] * 0.9), 0), max(int(self.leds[i][2] * 0.9), 0)]
+                        self.leds[j][0] = int(self.leds[j][0] * 0.9)
+                        self.leds[j][1] = int(self.leds[j][1] * 0.9)
+                        self.leds[j][2] = int(self.leds[j][2] * 0.9)
                 self.leds.write()
                 sleep(0.025)
 
@@ -181,16 +119,24 @@ class Leds:
                 self.add_numbers(values = k)
                 self.leds.write()
             
+            
         for i in range(self.width):
             temp.append([int(random()*256), int(random()*256), int(random()*256)])
             self.leds[i] = temp[-1]
         self.leds.write()
+        
+        while True:
+            temp = [*temp[-1], *temp[0:-1]]
+            for i in temp:
+                self.leds[i] = i
+            self.leds.write()
+            sleep(0.25)
 
     def add_numbers(self, design_list:dict = False, color:list = [255, 255, 255], values:str = False, animation:int = 0):
         """
         It helps to create displays, pass the list of characters in a list and pass a string of what should be written.
         """
-        if self.numbers == None:
+        if self.numbers = None:
             self.numbers = design_list
         else:
             design_list = self.numbers
@@ -300,10 +246,11 @@ class Matrix_Leds:
             for j in range(len(matrix[0])):
                 final_matrix.append(matrix[i][j])
 
-        for i in range(self.width):
+        for i in range(self.width)
             self.leds[i] = final_matrix[i]
 
         self.leds.write()
+        
 
 color = {"blue": [0,0,255],
          "lightblue": [173,216,230],
@@ -344,77 +291,4 @@ color = {"blue": [0,0,255],
          "powderblue": [176,224,230],
          "gray": [128,128,128],
          "silver": [192,192,192],
-         "dimgray": [105,105,105],
-         "fire": [255, 40, 0]}
-
-numbers = {"0":[1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                0,0,0],
-           "1":[0,0,0,
-                0,0,0,
-                1,1,1,
-                1,1,1,
-                0,0,0,
-                0,0,0,
-                0,0,0],
-           "2":[1,1,1,
-                1,1,1,
-                0,0,0,
-                1,1,1,
-                1,1,1,
-                0,0,0,
-                1,1,1],
-           "3":[0,0,0,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                0,0,0,
-                1,1,1],
-           "4":[0,0,0,
-                0,0,0,
-                1,1,1,
-                1,1,1,
-                0,0,0,
-                1,1,1,
-                1,1,1],
-           "5":[0,0,0,
-                1,1,1,
-                1,1,1,
-                0,0,0,
-                1,1,1,
-                1,1,1,
-                1,1,1],
-           "6":[1,1,1,
-                1,1,1,
-                1,1,1,
-                0,0,0,
-                1,1,1,
-                1,1,1,
-                1,1,1],
-           "7":[0,0,0,
-                0,0,0,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                0,0,0,
-                0,0,0],
-           "8":[1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1],
-           "9":[0,0,0,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1,
-                1,1,1]}
-
+         "dimgray": [105,105,105]}
