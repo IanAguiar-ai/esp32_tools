@@ -10,107 +10,76 @@ ota(link)
 """
 from urequests import get
 import os
+from gc import collect
 
-def find_version(dir_:str):
-    """
-    Find the file version
-    """
-    text = []
-
+def find_version(dir_: str):
     with open(dir_, 'r') as arq:
-        text = arq.readlines()
-
-    for line in text:
-        if line.replace(" ","").find('version=[')> -1 or line.replace(" ","").find('version=(')> -1:
-            n = line
-            for rep in ["version", " ", "=", "[", "]", "(", ")"]:
-                n = n.replace(rep, "")
-            version = list(map(int, n.split(",")))
-            print(f"Version {version[0]}.{version[1]}.{version[2]}")
-            return version
+        for line in arq:
+            if line.replace(" ", "").find('version=[') > -1 or line.replace(" ", "").find('version=(') > -1:
+                n = line
+                for rep in ["version", " ", "=", "[", "]", "(", ")"]:
+                    n = n.replace(rep, "")
+                version = list(map(int, n.split(",")))
+                print(f"Version {version[0]}.{version[1]}.{version[2]}")
+                return version
     return [0, 0, 0]
 
-def rename(dir_:str):
+def rename(dir_: str):
     old = 'old_' + dir_
     os.rename(dir_, old)
     print(f"{dir_} is now {old}")
 
-def ota(link:str):
-    """
-    Pass the github link of the code you want to update.
-    """
-
-    while True:
-        #Requesition:
+def ota(link:str, chunk_size:int = 4096, name:str = None):
+    collect()
+    
+    if name == None:
         name = link[link.rfind("/") + 1:]
-        
-        try:
-            x = get(link)
-            print(f'encoding: {x.encoding}')
-        except:
-            print("The previous link does not exist!")
-            return None
 
-        #Old  version to compare:
-        try:
-            version = find_version(name)
-        except:
-            print(f"This file ({name}) does not exist in memory!")
-            return None
+    try:
+        x = get(link)
+        print(f'encoding: {x.encoding}')
+    except:
+        print("The previous link does not exist!")
+        return None
 
-        #Code manipulation:
-        text = x.text
-        text = text.split('","')
+    try:
+        version = find_version(name)
+    except:
+        print(f"This file ({name}) does not exist in memory!")
+        return None
 
-        len_ = len(text)
-        print(f"Download {name}...\n|", end = "")
-        line_ = 0
-        for line in text:
-            if line.find('"rawLines":[')> -1:
-                start = line_ + 1
+    # Code manipulation:
+    len_ = 99999
+    print(f"Download {name}...\n|", end="")
+    can_write = False
+    exist_file = False
 
-            elif line.find('"],"stylingDirectives"')> -1:
-                end = line_
+    with open("new_"+name, 'w') as arq:
+        for i in range(0, len_, chunk_size):
+            segment = x.raw.read(chunk_size).decode(x.encoding)
+            for line in segment.split('","'):
+                if line.replace(" ","").find('version=[') > -1:
+                    n = line[line.replace(" ","").find('version=[') + len('version=['):]
+                    n = n[:n.find("]")]
+                    for rep in ["version", " ", "=", "[", "]", "(", ")"]:
+                        n = n.replace(rep, "")
+                    new_version = list(map(int, n.split(",")))
+                arq.write(f'{line}\n')
+                
+                print("=", end="")
+            collect()
+    print("|")
 
-            elif line.replace(" ","").find('version=[')> -1 or line.replace(" ","").find('version=(')> -1:
-                n = line
-                for rep in ["version", " ", "=", "[", "]", "(", ")"]:
-                    n = n.replace(rep, "")
-                new_version = list(map(int, n.split(",")))
-            line_ += 1
-
-            if line_ % (int(len_/20) + 1) == 0:
-                print("=", end = "")
-        print("|")
-
-        text = text[start:end]
-        
-        for i in range(len(text)):
-            for a, b in [['\\"', '"'], ["\\'", "'"], ["\\\\", "\\"]]:
-                    text[i] = text[i].replace(a, b)
-
-        #Save new code if is newer:
-        try:
-            if version[0] * 1_000_000 + version[1] * 1_000 + version[2] < new_version[0] * 1_000_000 + new_version[1] * 1_000 + new_version[2]:
-                try:
-                    print(f"Write new file {name}\n|", end = "")
-                    dir_ = name
-                    with open(dir_, 'w') as arq:
-                        line_ = 0
-                        for line in text:
-                            if line_ % (int(len_/20) + 1) == 0:
-                                print("=", end = "")    
-                            arq.write(f'{line}\n')
-                            line_ += 1
-                    print("|")
-                except:
-                    rename(name)
-
-                print(f'OTA completed!')
-                return True
-            else:
-                print(f"You are already on the latest version of {name} (version = {version[0]}.{version[1]}.{version[2]})!")
-                return False
-        except UnboundLocalError:
-            print("The update file does not have the corresponding version.")
-            return None
+    try:
+        new_version = find_version("new_"+name)
+        if version[0] * 1_000_000 + version[1] * 1_000 + version[2] < new_version[0] * 1_000_000 + new_version[1] * 1_000 + new_version[2]:
+            os.remove(name)
+            os.rename("new_"+name, name)
+            print(f"OTA completed!")
+            return True
+        else:
+            print(f"You are already on the latest version of {name} (version = {version[0]}.{version[1]}.{version[2]})!")
+            return False
+    except UnboundLocalError:
+        print("The update file does not have the corresponding version.")
+        return None
