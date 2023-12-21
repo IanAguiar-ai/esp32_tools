@@ -1,11 +1,11 @@
 """
 Application to do OTA
 
-You must pass the github link of the code you want to update,
+You must pass the github raw link of the code you want to update,
 it must always have a line written 'version'.
 
 Use:
-link = 'your_link_github'
+link = 'your_link_github_raw'
 ota(link)
 """
 from urequests import get
@@ -48,36 +48,35 @@ def ota(link:str, chunk_size:int = 4096, name:str = None):
         print(f"This file ({name}) does not exist in memory!")
         return None
 
-    # Code manipulation:
-    len_ = 99999
+    len_ = 100_000
     print(f"Download {name}...\n|", end="")
-    can_write = False
-    exist_file = False
+    can_write = True
 
     with open("new_"+name, 'w') as arq:
         for i in range(0, len_, chunk_size):
-            segment = x.raw.read(chunk_size).decode(x.encoding)
-            for line in segment.split('","'):
+            if can_write:
+                line = x.raw.read(chunk_size).decode(x.encoding)
                 if line.replace(" ","").find('version=[') > -1:
                     n = line[line.replace(" ","").find('version=[') + len('version=['):]
                     n = n[:n.find("]")]
                     for rep in ["version", " ", "=", "[", "]", "(", ")"]:
                         n = n.replace(rep, "")
                     new_version = list(map(int, n.split(",")))
+                    if not (version[0] * 1_000_000 + version[1] * 1_000 + version[2] < new_version[0] * 1_000_000 + new_version[1] * 1_000 + new_version[2]):
+                        can_write = False
                 arq.write(f'{line}\n')
-                
-                print("=", end="")
+            print("=", end="")
             collect()
     print("|")
 
     try:
-        new_version = find_version("new_"+name)
-        if version[0] * 1_000_000 + version[1] * 1_000 + version[2] < new_version[0] * 1_000_000 + new_version[1] * 1_000 + new_version[2]:
+        if can_write:
             os.remove(name)
             os.rename("new_"+name, name)
             print(f"OTA completed!")
             return True
-        else:
+        elif not can_write:
+            os.remove("new_"+name)
             print(f"You are already on the latest version of {name} (version = {version[0]}.{version[1]}.{version[2]})!")
             return False
     except UnboundLocalError:
