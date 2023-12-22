@@ -27,6 +27,15 @@ def find_version(dir_: str):
                 return version
     return [0, 0, 0]
 
+def ota(link:str, chunk_size:int = 4096):
+    """
+    Full OTA
+    """
+    name = link[link.rfind("/") + 1:]
+    if not ota_update(name):
+        ota_download(link)
+    return True
+
 def ota_download(link:str, chunk_size:int = 4096, name:str = None):
     """
     Download the program and save it so the board can be updated
@@ -62,7 +71,7 @@ def ota_download(link:str, chunk_size:int = 4096, name:str = None):
                 arq.write(f'{line}\n')
             print("=", end="")
             collect()
-    print("|")
+    print("| (Download complete)")
 
     try:
         if not can_write:
