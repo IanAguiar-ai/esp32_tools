@@ -5,8 +5,11 @@ You must pass the github raw link of the code you want to update,
 it must always have a line written 'version'.
 
 Use:
+
 link = 'your_link_github_raw'
-ota(link)
+name = 'program.py'
+if not ota_update(name):
+    ota_download(link)
 """
 from urequests import get
 import os
@@ -24,12 +27,10 @@ def find_version(dir_: str):
                 return version
     return [0, 0, 0]
 
-def rename(dir_: str):
-    old = 'old_' + dir_
-    os.rename(dir_, old)
-    print(f"{dir_} is now {old}")
-
-def ota(link:str, chunk_size:int = 4096, name:str = None):
+def ota_download(link:str, chunk_size:int = 4096, name:str = None):
+    """
+    Download the program and save it so the board can be updated
+    """
     collect()
     
     if name == None:
@@ -40,12 +41,6 @@ def ota(link:str, chunk_size:int = 4096, name:str = None):
         print(f'encoding: {x.encoding}')
     except:
         print("The previous link does not exist!")
-        return None
-
-    try:
-        version = find_version(name)
-    except:
-        print(f"This file ({name}) does not exist in memory!")
         return None
 
     len_ = 100_000
@@ -70,15 +65,30 @@ def ota(link:str, chunk_size:int = 4096, name:str = None):
     print("|")
 
     try:
-        if can_write:
-            os.remove(name)
-            os.rename("new_"+name, name)
-            print(f"OTA completed!")
-            return True
-        elif not can_write:
+        if not can_write:
             os.remove("new_"+name)
-            print(f"You are already on the latest version of {name} (version = {version[0]}.{version[1]}.{version[2]})!")
-            return False
+        return False
+    except:
+        pass
+    return True
+
+def ota_update(name:str):
+    """
+    Update the program that has already been downloaded
+    """
+    collect()
+
+    try:
+        version = find_version("new_"+name)
+    except:
+        print(f"This file ({name}) does not exist in memory!")
+        return False
+
+    try:
+        os.remove(name)
+        os.rename("new_"+name, name)
+        print(f"OTA completed!")
+        return True
     except UnboundLocalError:
         print("The update file does not have the corresponding version.")
-        return None
+        return False
