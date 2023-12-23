@@ -36,7 +36,7 @@ def ota(link:str, chunk_size:int = 4096):
         ota_download(link)
     return True
 
-def ota_download(link:str, chunk_size:int = 4096, name:str = None):
+def ota_download(link:str, chunk_size:int = 4096, name:str = None, version:list = [0, 0, 0]):
     """
     Download the program and save it so the board can be updated
     """
@@ -71,7 +71,7 @@ def ota_download(link:str, chunk_size:int = 4096, name:str = None):
                 arq.write(f'{line}\n')
             print("=", end="")
             collect()
-    print("| (Download complete)")
+    print(f"| (Download of new_{name} complete)")
 
     try:
         if not can_write:
@@ -88,16 +88,22 @@ def ota_update(name:str):
     collect()
 
     try:
-        version = find_version("new_"+name)
+        version = find_version(name)
+        new_version = find_version("new_"+name)
     except:
-        print(f"This file ({name}) does not exist in memory!")
+        print(f"This file ({name}) or a new version does not exist in memory!")
         return False
 
     try:
-        os.remove(name)
-        os.rename("new_"+name, name)
-        print(f"OTA completed!")
-        return True
+        if version[0] * 1_000_000 + version[1] * 1_000 + version[2] < new_version[0] * 1_000_000 + new_version[1] * 1_000 + new_version[2]:
+            os.remove(name)
+            os.rename("new_"+name, name)
+            print(f"OTA completed! ({version}) to ({new_version})")
+            return True
+        else:
+            print(f"Alread in the latest version ({version})!")
+            os.remove("new_"+name)
+            return False
     except UnboundLocalError:
         print("The update file does not have the corresponding version.")
         return False
