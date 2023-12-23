@@ -160,3 +160,35 @@ log.size()
 my_log = log.read()
 print(my_log)
 ```
+
+## ```OTA_esp32.py```
+Library to update code!
+
+Full OTA example:
+
+```
+from OTA_esp32 import ota
+
+link = 'link_github_raw_code'
+ota(link)
+
+...
+rest of application
+...
+```
+
+OTA download and update:
+
+```
+from OTA_esp32 import ota
+
+link = 'link_github_raw_code'
+ota_donwload(link)
+ota_upload(link)
+
+...
+rest of application
+...
+```
+
+
