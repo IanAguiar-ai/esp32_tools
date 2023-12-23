@@ -184,7 +184,7 @@ from OTA_esp32 import ota
 
 link = 'link_github_raw_code'
 ota_donwload(link)
-ota_upload(link)
+ota_update(link)
 
 ...
 rest of application
