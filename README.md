@@ -191,4 +191,4 @@ rest of application
 ...
 ```
 
-
+<img src="https://raw.githubusercontent.com/IanAguiar-ai/esp32_tools/main/images/graph_ota.svg">
