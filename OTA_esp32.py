@@ -23,7 +23,7 @@ def find_version(dir_: str):
                 for rep in ["version", " ", "=", "[", "]", "(", ")"]:
                     n = n.replace(rep, "")
                 version = list(map(int, n.split(",")))
-                print(f"Version {version[0]}.{version[1]}.{version[2]}")
+                print(f"Version of {dir_} {version[0]}.{version[1]}.{version[2]}")
                 return version
     return [0, 0, 0]
 
@@ -44,6 +44,12 @@ def ota_download(link:str, chunk_size:int = 4096, name:str = None, version:list 
     
     if name == None:
         name = link[link.rfind("/") + 1:]
+        
+    try:
+        version_ = find_version(name)
+        version = version_
+    except:
+        print(f"{name} is already in operation...")
 
     try:
         x = get(link)
@@ -73,12 +79,10 @@ def ota_download(link:str, chunk_size:int = 4096, name:str = None, version:list 
             collect()
     print(f"| (Download of new_{name} complete)")
 
-    try:
-        if not can_write:
-            os.remove("new_"+name)
-        return False
-    except:
-        pass
+    if not can_write:
+        os.remove("new_"+name)
+        print(f"new_{name} removed...")
+
     return True
 
 def ota_update(name:str):
@@ -89,21 +93,29 @@ def ota_update(name:str):
 
     try:
         version = find_version(name)
+    except:
+        print(f"{name} does not exist in memory!")
+        return False
+    
+    try:
         new_version = find_version("new_"+name)
     except:
-        print(f"This file ({name}) or a new version does not exist in memory!")
+        print(f"new_{name} does not exist in memory!")
         return False
 
     try:
         if version[0] * 1_000_000 + version[1] * 1_000 + version[2] < new_version[0] * 1_000_000 + new_version[1] * 1_000 + new_version[2]:
             os.remove(name)
+            print(f"{name} removed...")
             os.rename("new_"+name, name)
-            print(f"OTA completed! ({version}) to ({new_version})")
+            print(f"rename new_{name} to {name}")
+            print(f"OTA completed! ({version[0]}.{version[1]}.{version[2]}) to ({version_new[0]}.{version_new[1]}.{version_new[2]})")
             return True
         else:
-            print(f"Alread in the latest version ({version})!")
+            print(f"Alread in the latest version ({version[0]}.{version[1]}.{version[2]})!")
             os.remove("new_"+name)
-            return False
+            print(f"new_{name} removed...")
+            return True
     except UnboundLocalError:
         print("The update file does not have the corresponding version.")
         return False
