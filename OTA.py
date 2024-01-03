@@ -70,7 +70,7 @@ def ota(link:str):
 
         elif line.replace(" ","").find('version=[')> -1 or line.replace(" ","").find('version=(')> -1:
             n = line
-            for rep in ["version", " ", "=", "[", "]", "(", ")"]:
+            for rep in ["version", " ", "=", "[", "]", "(", ")", "\\", "r"]:
                 n = n.replace(rep, "")
             new_version = list(map(int, n.split(",")))
         line_ += 1
