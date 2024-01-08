@@ -192,3 +192,19 @@ rest of application
 ```
 
 <img src="https://raw.githubusercontent.com/IanAguiar-ai/esp32_tools/main/images/graph_ota.svg">
+
+## ```VOTA.py```
+Library to update code esp to esp!
+
+Example:
+
+```
+from VOTA import Vota
+ips_esp = ['esp1', 'esp2', 'esp2'] #mac ESPs
+
+point = Vota(ips = ips_esp)
+point.information() #SELF MAC
+
+point.update_programs() #If can update
+point.viral()
+```
