@@ -6,7 +6,7 @@ from time import sleep
 import espnow
 import network
 
-class vota:
+class Vota:
     """
     É um OTA viral, não precisa de servidor, ele vai contagiando outros pontos com as versões mais novas
 
