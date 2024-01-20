@@ -24,7 +24,7 @@ class Uart:
                         self.uart.write(line.decode('utf-8'))
                     if text_full.find("\r") > -1:
                         self.uart.write(f"\n")
-                        self.logic(text_full)
+                        self.logic(text_full, self.uart)
                         text_full = ""
                         self.uart.write("\n>>>")
             
@@ -36,3 +36,7 @@ class Uart:
                 sleep(0.02)
 
         _thread.start_new_thread(thread_run,())
+
+    def write(self, text):
+        self.uart.write(text)
+        
