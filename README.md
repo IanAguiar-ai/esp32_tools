@@ -110,35 +110,36 @@ Library made to generate time series graphs, example:
 from machine import Pin, I2C
 import ssd1306
 from graph_ssd1306 import Graph
-
 from random import random
+
 i2c = I2C(0, scl = Pin(22), sda = Pin(21))
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
-visor = Graph(display = oled, limits_x = (5, 90), limits_y = (20, 60), dimensions_visor = (128, 64), parameters = {"limits":False, "last":False})
-visor_2 = Graph(display = oled, limits_x = (5, 90), limits_y = (20, 60), dimensions_visor = (128, 64), parameters = {"limits":False, "last":False})
+visor = Graph(display = oled, limits_x = (5, 60), limits_y = (35, 60), dimensions_visor = (128, 64), parameters = {"limits":False, "last":False})
+visor_2 = Graph(display = oled, limits_x = (64, 120), limits_y = (35, 60), dimensions_visor = (128, 64), parameters = {"limits":False, "last":False})
+visor_3 = Graph(display = oled, limits_x = (5, 120), limits_y = (3, 30), dimensions_visor = (128, 64), parameters = {"limits":False, "last":False})
 
 for i in range(10):
     visor.add(random()*30)
 
-last = 200
 while True:
-    value = random() * 200 + 100
-    last = value+random()*30
-    visor.add(value, 7)
-    visor_2.add(last, 7)
+    visor.add(random() * 200 + 100, 7)
+    visor_2.add(random() * 200 + 100, 7)
+    visor_3.add(random() * 200 + 100, 7)
 
     oled.fill(0)
     visor.make_graph()
     visor.draw_graph()
     visor_2.make_graph()
     visor_2.draw_graph()
+    visor_3.make_graph()
+    visor_3.draw_graph()
     oled.show()
 
     sleep(0.1)
 ```
 
-<img src="https://raw.githubusercontent.com/IanAguiar-ai/esp32_tools/main/images/ssd1306_1.PNG">
+<img src="https://raw.githubusercontent.com/IanAguiar-ai/esp32_tools/main/images/ssd1306_3.PNG">
 
 ```
 from machine import Pin, I2C
