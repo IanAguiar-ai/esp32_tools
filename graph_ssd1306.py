@@ -1,8 +1,3 @@
-from machine import Pin, I2C
-import ssd1306
-from time import time, ticks_us, sleep
-from random import random
-
 class Graph:
     def __init__(self, display, limits_x:tuple = None, limits_y:tuple = None, dimensions_visor:tuple = (128, 64), parameters = None):
         """
@@ -11,7 +6,9 @@ class Graph:
         #Parameters:
         self.parameters = {"edge":True,
                            "hard":True,
-                           "scale":True}
+                           "grid":True,
+                           "limits":True,
+                           "last":True}
         if parameters != None:
             for parameter in parameters.keys():
                 if parameter in self.parameters:
@@ -64,7 +61,7 @@ class Graph:
             self.normalize()            
 
             self.to_draw = []
-            diference = (self.limits_x[1] - self.limits_x[0])/(len(self.temporary)-1)
+            diference = (self.limits_x[1] - self.limits_x[0])/max(len(self.temporary)-1, 1)
 
             self.to_draw.append([self.limits_x[0], self.limits_y[1] - self.treated[0]])
             for i in range(1, len(self.temporary)):
@@ -89,19 +86,32 @@ class Graph:
                 for k_ in range(min(int(variation*(k) + intercept), int(variation*(k+1) + intercept)), max(int(variation*(k) + intercept), int(variation*(k+1) + intercept))):
                     self.oled.pixel(k, k_, 1)
 
-        if self.parameters["scale"]:
-            pass
-    
-i2c = I2C(0, scl = Pin(22), sda = Pin(21))
-oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+        if self.parameters["grid"]:
+            for line in range(self.limits_y[0], self.limits_y[1], 10):
+                for len_line in range(self.limits_x[0], self.limits_x[1], 1):
+                    if len_line % 5 < 2:
+                        self.oled.pixel(len_line, line, 1)
 
-visor = Graph(display = oled, limits_x = None, limits_y = (30, 64), dimensions_visor = (128, 64))
+        if self.parameters["limits"]:
+            min_ = min(self.values)
+            max_ = max(self.values)
 
-for i in range(10):
-    visor.add(random()*30)
+            if type(min_) == float:
+                min_ = f"{min_:0.1f}"
+            else:
+                min_ = int(min_)
+            
+            if type(max_) == float:
+                max_ = f"{max_:0.1f}"
+            else:
+                max_ = int(max_)
 
-while True:
-    visor.add(random(), 10)
-    visor.run()
-    sleep(1)
-    print("print")
+            self.oled.text(str(min_), self.limits_x[1], self.limits_y[1] - 6)
+            self.oled.text(str(max_), self.limits_x[1], self.limits_y[0])
+        
+        if self.parameters["last"]:
+            if type(self.values[-1]) == float:
+                final_value = f"{self.values[-1]:0.1f}"
+            else:
+                final_value = int(self.values[-1])
+            self.oled.text(str(final_value), self.limits_x[1], int((self.limits_y[1]+self.limits_y[0])/2) - 3)
