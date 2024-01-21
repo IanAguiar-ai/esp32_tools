@@ -103,27 +103,91 @@ my_led_tv.strings = you_dict #Your dict of characters
 my_led_tv.write("ABCDEFGHIJ")
 ```
 
-## ```graph_in_ssd1306.py```
-Library made to generate time series graphs, exemple:
+## ```graph_ssd1306.py```
+Library made to generate time series graphs, example:
 
 ```
-from graph_in_ssd1306 import Graph
-import ssd1306 #Dependenci
-
-oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
-temporal_series_graph = Graph(oled, x = (30, 100), y = (10, 40), dimensions_visor = (128, 64))
+from machine import Pin, I2C
+import ssd1306
+from graph_ssd1306 import Graph
 
 from random import random
-from time import sleep
-for i in range(30):
-  sleep(0.01)
-  temporal_series_graph.add(random() * 100)
-  temporal_series_graph.pass_to_graph()
+i2c = I2C(0, scl = Pin(22), sda = Pin(21))
+oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
-  ## Other things on display
+visor = Graph(display = oled, limits_x = (5, 90), limits_y = (20, 60), dimensions_visor = (128, 64), parameters = {"limits":False, "last":False})
+visor_2 = Graph(display = oled, limits_x = (5, 90), limits_y = (20, 60), dimensions_visor = (128, 64), parameters = {"limits":False, "last":False})
 
-  oled.fill(0) ## Clean the display
+for i in range(10):
+    visor.add(random()*30)
+
+last = 200
+while True:
+    value = random() * 200 + 100
+    last = value+random()*30
+    visor.add(value, 7)
+    visor_2.add(last, 7)
+
+    oled.fill(0)
+    visor.make_graph()
+    visor.draw_graph()
+    visor_2.make_graph()
+    visor_2.draw_graph()
+    oled.show()
+
+    sleep(0.1)
 ```
+
+<img src="https://raw.githubusercontent.com/IanAguiar-ai/esp32_tools/main/images/ssd1306_1.PNG">
+
+```
+from machine import Pin, I2C
+import ssd1306
+from graph_ssd1306 import Graph
+from time import time, ticks_us, sleep
+from random import random
+
+i2c = I2C(0, scl=Pin(22), sda=Pin(21))
+oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+visor = Graph(display = oled, limits_x = [0, 110], limits_y = (20, 63), dimensions_visor = (128, 64))
+
+tempo_visor = time()
+t0 = ticks_us()
+tempo_medio = 0
+operacoes_loop = 10
+
+
+precicao_barra = 12
+grafico = [int(5 + random() * 30) for i in range(precicao_barra)]
+for i in grafico:
+    visor.add(i, precicao_barra)
+
+while True:
+    if time() - tempo_visor >= 0.5:
+        oled.fill(0)
+        oled.text(f"{int(tempo_medio)}us", 0, 0)
+        oled.text(f"Operacoes: {operacoes_loop}", 0, 10) 
+        visor.add(operacoes_loop, precicao_barra)
+        visor.make_graph()
+        visor.draw_graph()
+        oled.show()
+
+        tempo_visor = time()
+
+    if tempo_medio < 4000:
+        operacoes_loop += 1
+    elif tempo_medio > 4000:
+        operacoes_loop -= 1
+
+    for i in range(operacoes_loop):
+        k = i
+
+    t1 = ticks_us()
+    tempo_medio = (t1-t0)*0.1 + tempo_medio*0.9
+    t0 = t1   
+```
+
+<img src="https://raw.githubusercontent.com/IanAguiar-ai/esp32_tools/main/images/ssd1306_2.PNG">
 
 ## ```wifi_esp32.py```
 Library to help connect esp32 to wifi, exemple:
