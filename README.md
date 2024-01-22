@@ -190,6 +190,58 @@ while True:
 
 <img src="https://raw.githubusercontent.com/IanAguiar-ai/esp32_tools/main/images/ssd1306_2.PNG">
 
+```
+from machine import Pin, I2C
+import ssd1306
+from graph_ssd1306 import Graph
+from random import random
+
+if __name__ == "__main__":
+    from machine import Pin, I2C
+    from random import random
+
+    i2c = I2C(0, scl = Pin(22), sda = Pin(21))
+    oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+
+    visor = Graph(display = oled, limits_x = (65, 85), limits_y = (10, 53), dimensions_visor = (128, 64), parameters = {"type":"boxplot"})
+
+    for i in range(30):
+        visor.add(random() * 10 + random() * 10 + random() * 10, 30)
+
+    while True:
+        visor.add(random() * 10 + random() * 10 + random() * 10, 30)
+        visor.run()
+
+```
+
+<img src="https://raw.githubusercontent.com/IanAguiar-ai/esp32_tools/main/images/ssd1306_5.PNG">
+
+```
+from machine import Pin, I2C
+import ssd1306
+from graph_ssd1306 import Graph
+from random import random
+
+if __name__ == "__main__":
+    from machine import Pin, I2C
+    from random import random
+
+    i2c = I2C(0, scl = Pin(22), sda = Pin(21))
+    oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+
+    visor = Graph(display = oled, limits_x = (65, 85), limits_y = (10, 53), dimensions_visor = (128, 64), parameters = {"type":"histogram"})
+
+    for i in range(30):
+        visor.add(random() * 10 + random() * 10 + random() * 10, 30)
+
+    while True:
+        visor.add(random() * 10 + random() * 10 + random() * 10, 30)
+        visor.run()
+
+```
+
+<img src="https://raw.githubusercontent.com/IanAguiar-ai/esp32_tools/main/images/ssd1306_4.PNG">
+
 ## ```wifi_esp32.py```
 Library to help connect esp32 to wifi, exemple:
 
