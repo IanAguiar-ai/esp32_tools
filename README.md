@@ -104,7 +104,7 @@ my_led_tv.write("ABCDEFGHIJ")
 ```
 
 ## ```graph_ssd1306.py```
-Library made to generate time series graphs, example:
+Library made to generate graphs, example:
 
 ```
 from machine import Pin, I2C
