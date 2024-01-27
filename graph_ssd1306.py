@@ -11,6 +11,7 @@ class Graph:
         self.parameters = {"edge":True,
                            "hard":True,
                            "grid":True,
+                           "limits_value":False,
                            "limits":True,
                            "last":True,
                            "type":"time_series",
@@ -53,8 +54,12 @@ class Graph:
                 self.values.pop(0)
 
     def normalize(self):
-        min_op = min(self.temporary)
-        max_op = max(self.temporary) - min_op + 1
+        if self.parameters["limits_value"] != False and (type(self.parameters["limits_value"]) == list or type(self.parameters["limits_value"]) == tuple):
+            min_op = self.parameters["limits_value"][0]
+            max_op = self.parameters["limits_value"][1] + 1
+        else:
+            min_op = min(self.temporary)
+            max_op = max(self.temporary) - min_op + 1
 
         for i in range(len(self.temporary)):
             self.treated[i] = (self.temporary[i] - min_op + 1)/max_op * (self.limits_y[1] - self.limits_y[0] - 1)
@@ -84,21 +89,25 @@ class Graph:
 
     def draw_simple(self, i):
         if self.parameters["limits"]:
+            if self.parameters["limits_value"] != False and (type(self.parameters["limits_value"]) == list or type(self.parameters["limits_value"]) == tuple):
+                min_ = self.parameters["limits_value"][0]
+                max_ = self.parameters["limits_value"][1] + 1
+            else:
                 min_ = min(self.values)
                 max_ = max(self.values)
 
-                if type(min_) == float:
-                    min_ = f"{min_:0.1f}"
-                else:
-                    min_ = int(min_)
+            if type(min_) == float:
+                min_ = f"{min_:0.1f}"
+            else:
+                min_ = int(min_)
                 
-                if type(max_) == float:
-                    max_ = f"{max_:0.1f}"
-                else:
-                    max_ = int(max_)
+            if type(max_) == float:
+                max_ = f"{max_:0.1f}"
+            else:
+                max_ = int(max_)
 
-                self.oled.text(str(min_), self.limits_x[1], self.limits_y[1] - 6)
-                self.oled.text(str(max_), self.limits_x[1], self.limits_y[0])
+            self.oled.text(str(min_), self.limits_x[1], self.limits_y[1] - 6)
+            self.oled.text(str(max_), self.limits_x[1], self.limits_y[0])
                 
         if self.parameters["type"] == "time_series":
             variation = (self.to_draw[i][1]-self.to_draw[i-1][1])/(self.to_draw[i][0]-self.to_draw[i-1][0])
