@@ -148,22 +148,33 @@ class Graph:
 
                 outliers = [value for value in sorted_data if value < lower_limit or value > upper_limit]
 
+                median = 0
+                for i in data:
+                    median += i
+                median = median/len(data)
+
                 return {'lower_limit': lower_limit,
                         'upper_limit': upper_limit,
-                        'outliers': outliers}
+                        'outliers': outliers,
+                        'median': median}
 
             temporary = boxplot_values(list(map(lambda x: x[1], self.to_draw)))
-            #print(temporary)
-
+            
             for x in range(int(self.limits_x[0]) + 5, int(self.limits_x[1]) - 5):
-                self.oled.pixel(x, int(temporary["lower_limit"]), 1)
-                self.oled.pixel(x, int(temporary["upper_limit"]), 1)
+                if int(temporary["lower_limit"]) > self.limits_y[0] and int(temporary["lower_limit"]) < self.limits_y[1]:
+                    self.oled.pixel(x, int(temporary["lower_limit"]), 1)
+                if int(temporary["upper_limit"]) > self.limits_y[0] and int(temporary["upper_limit"]) < self.limits_y[1]:
+                    self.oled.pixel(x, int(temporary["upper_limit"]), 1)
             for y in range(int(temporary["lower_limit"]), int(temporary["upper_limit"])):
-                self.oled.pixel(int(self.limits_x[0]) + 5, y, 1)
-                self.oled.pixel(int(self.limits_x[1]) - 5, y, 1)
+                if y > self.limits_y[0] and y < self.limits_y[1]:
+                    self.oled.pixel(int(self.limits_x[0]) + 5, y, 1)
+                    self.oled.pixel(int(self.limits_x[1]) - 5, y, 1)
             for y in temporary["outliers"]:
-                for x in range(int((self.limits_x[0] + self.limits_x[1])/2) - 1, int((self.limits_x[0] + self.limits_x[1])/2) + 2):
-                    self.oled.pixel(x, int(y), 1)
+                if y > self.limits_y[0] and y < self.limits_y[1]:
+                    for x in range(int((self.limits_x[0] + self.limits_x[1])/2) - 1, int((self.limits_x[0] + self.limits_x[1])/2) + 2):
+                        self.oled.pixel(x, int(y), 1)
+            for x in range(int((self.limits_x[0] + self.limits_x[1])/2) - 1, int((self.limits_x[0] + self.limits_x[1])/2) + 2):
+                self.oled.pixel(x, int(temporary['median']), 1)
 
         elif self.parameters["type"] == "histogram":
             def count_by_limit(data_list, limits):
