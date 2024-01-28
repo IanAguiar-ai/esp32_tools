@@ -52,18 +52,17 @@ class Register:
             self.put(number)
 
     def put(self, number:int):
-        print(number)
-        data.value(0)
-        clock.value(1)
-        clock.value(0)
-        latch.value(1)
-        latch.value(0)
+        self.data.value(0)
+        self.clock.value(1)
+        self.clock.value(0)
+        self.latch.value(1)
+        self.latch.value(0)
         for i in range(7):
-            data.value(self.number[int(number)][i])
-            clock.value(1)
-            clock.value(0)
-            latch.value(1)
-            latch.value(0)
+            self.data.value(self.number[int(number)][i])
+            self.clock.value(1)
+            self.clock.value(0)
+            self.latch.value(1)
+            self.latch.value(0)
 
             sleep(self.time)
 
@@ -91,8 +90,6 @@ class Register:
             sleep(40) # timer_sleep < reset_sleep
             self.reset_ = False
         
-            
-
 class Pulse_Button:
     def __init__(self, pin:int):
         self.button = Pin(pin, Pin.IN)
@@ -107,4 +104,3 @@ class Pulse_Button:
 
     def value(self):
         return self.button.value()
-        
