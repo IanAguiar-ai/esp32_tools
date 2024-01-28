@@ -62,11 +62,15 @@ shift_register_and_display.timer() #Preferably leave this running in a thread
 ```
 
 ```
+from register import Register
+from time import sleep
+
 if __name__ == "__main__":
     reg = Register(data = 25, clock = 26, latch = 27, time = 1)
-    reg.put_number(5)
-    sleep(5000)
-    reg.put_number(3)
+
+    for i in range(0, 10):
+      reg.put_number(i)
+      sleep(1)
 ```
 <img src="https://raw.githubusercontent.com/IanAguiar-ai/esp32_tools/main/images/register_1.PNG">
 
