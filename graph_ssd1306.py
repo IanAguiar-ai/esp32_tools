@@ -90,16 +90,19 @@ class Graph:
     def draw_simple(self, i):
         if self.parameters["limits"]:
             if self.parameters["limits_value"] != False and (type(self.parameters["limits_value"]) == list or type(self.parameters["limits_value"]) == tuple):
-                min_ = self.parameters["limits_value"][0]
+                min_ = min(self.values) #self.parameters["limits_value"][0]
                 max_ = self.parameters["limits_value"][1] + 1
+                if type(min_) == float:
+                    min_ = f"{self.parameters["limits_value"][0]:0.1f}"
+                else:
+                    min_ = int(self.parameters["limits_value"][0])
             else:
                 min_ = min(self.values)
                 max_ = max(self.values)
-
-            if type(min_) == float:
-                min_ = f"{min_:0.1f}"
-            else:
-                min_ = int(min_)
+                if type(min_) == float:
+                    min_ = f"{min_:0.1f}"
+                else:
+                    min_ = int(min_)
                 
             if type(max_) == float:
                 max_ = f"{max_:0.1f}"
@@ -114,10 +117,11 @@ class Graph:
             intercept = self.to_draw[i-1][1] - variation * self.to_draw[i-1][0]
 
             for k in range(int(self.to_draw[i-1][0]), int(self.to_draw[i][0]) + 1, 1):
-                self.oled.pixel(k, int(variation*k + intercept), 1)
-                if self.parameters["hard"]:
-                    for k_ in range(min(int(variation*(k) + intercept), int(variation*(k+1) + intercept)), max(int(variation*(k) + intercept), int(variation*(k+1) + intercept))):
-                        self.oled.pixel(k, k_, 1)
+                if int(variation*k + intercept) > self.limits_y[0] and int(variation*k + intercept) < self.limits_y[1]:
+                    self.oled.pixel(k, int(variation*k + intercept), 1)
+                    if self.parameters["hard"]:
+                        for k_ in range(min(int(variation*(k) + intercept), int(variation*(k+1) + intercept)), max(int(variation*(k) + intercept), int(variation*(k+1) + intercept))):
+                            self.oled.pixel(k, k_, 1)
 
             if self.parameters["grid"]:
                 for line in range(self.limits_y[0], self.limits_y[1], 10):
