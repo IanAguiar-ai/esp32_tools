@@ -337,3 +337,37 @@ point.information() #SELF MAC
 point.update_programs() #If can update
 point.viral()
 ```
+
+## ```fila_inteligente.py```
+
+Object ```Fila``` or ```Queue``` receives the function, waiting time and priority level, the lower the higher the priority level. Example:
+
+```
+if __name__ == "__main__":
+    def printar_1():
+        print("1", end = "")
+
+    def printar_2():
+        print("2", end = "")
+
+    def printar_3():
+        print("3", end = "")
+
+    def printar_4():
+        print("4", end = "")
+        sleep(1)
+
+    def printar_():
+        print("-", end = "")
+
+    teste = Fila()
+
+    n = 1
+    teste.adicionar(printar_1, 1 * n, 4)
+    teste.adicionar(printar_2, 2 * n, 3)
+    teste.adicionar(printar_3, 3 * n, 2)
+    teste.adicionar(printar_4, 4 * n, 1)
+    teste.adicionar(printar_, 0.2 * n, 0)
+
+    teste.run()
+```
