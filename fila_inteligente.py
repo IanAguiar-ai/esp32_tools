@@ -36,6 +36,8 @@ class Fila:
     def adicionar(self, funcao:"funcao", tempo:float, nivel:int = 0) -> None:
         self.fila.append([funcao, tempo, tempo, nivel])
 
+Queue = Fila
+
 if __name__ == "__main__":
     def printar_1():
         print("1", end = "")
