@@ -1,0 +1,3 @@
+gcc -o exemplo_fila_inteligente exemplo.c fila_inteligente.c -lrt
+# -lrt é necessário para o clock da biblioteca librt
+
